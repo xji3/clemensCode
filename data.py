@@ -360,6 +360,7 @@ class Data:
         # All GeneIDs up until this point
         for i in list(set(all_geneids)):
             all_geneids.append(i)
+        all_geneids=list(set(all_geneids))
 
         print 'Multiple GeneIDs found for (PDB-ID: UniProt-ID: [ \'GeneIDs\' ]):'
         for i in multiple_geneids:
@@ -407,6 +408,7 @@ class Data:
         f.close()
         for i in list(set(tmp_ccds)):
             all_ccds.append(i)
+        all_ccde=list(set(all_ccds))
 
 #-------------------------------------------------------------------------------
     def getSeqs4CCDS(self, all_ccds, rm_ccds):
@@ -443,7 +445,7 @@ class Data:
 
 #-------------------------------------------------------------------------------
     def readCCDSseqs(self, all_ccds, filehandle, idx):
-        assert(idx >= 0 and idx <= 1)
+        assert(idx >= 0 and idx <= 1) # ccds_seqs[key][0]=pro seq, ccds_seqs[key][1]=nucleotide seq@Xiang
         key = ''
         readme = False
         for line in filehandle:
@@ -470,7 +472,7 @@ class Data:
             uniprot_no_ccds_id = []
 
             # Loop over UniProtIDs
-            for j in self.pdbid2uniprot[i]:
+            for j in self.pdbid2uniprot[i]: # j = UniProt ID
                 geneid_no_ccds_id = []
 
                 # Loop over GeneIDs

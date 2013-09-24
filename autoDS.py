@@ -14,9 +14,9 @@ from data import *
 optpars = OptionParser(usage="usage: %prog [options] filename",
                       version="%prog 0.1")
 
-office_Mac_address='/Users/xji3/Dropbox/My Files/BRC/Small Project/Clemens PY code'
-home_pc_address='G:/Dropbox/My Files/BRC/Small Project/Clemens PY code'
-laptop_address='E:/Dropbox/Dropbox/My Files/BRC/Small Project/Clemens PY code'
+office_Mac_address='/Users/xji3/clemensCode'
+#home_pc_address='G:/Dropbox/My Files/BRC/Small Project/Clemens PY code'
+#laptop_address='E:/Dropbox/Dropbox/My Files/BRC/Small Project/Clemens PY code'
 address=office_Mac_address
 
 group = OptionGroup(optpars, "Mandatory options")
