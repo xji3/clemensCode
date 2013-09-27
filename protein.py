@@ -199,7 +199,7 @@ class Protein:
 
 #-------------------------------------------------------------------------------
     def alignCCDSlocal(self):
-        for pdb2ccds in self.ccds_match:
+        for pdb2ccds in self.ccds_match: # here pdb2ccds is class PDB_CCDS, not the dict in class data class @Xiang
             out = self.alignLocalWater(pdb2ccds.ccds_AA) # use water for local alignment
             iter = out.__iter__()
             # Parse water's output
@@ -301,12 +301,17 @@ class Protein:
         print 'Using chain:', chain_list[0]
         chain = model[chain_list[0]]
 
-        ppb = Bio.PDB.PPBuilder()
+        ppb = Bio.PDB.PPBuilder() # ppb is now a PPBuilder class element @Xiang
+        # pdBuilder() uses C-N distance criterion
+        #ppb = Bio.PDB.CaPPBuilder()
+        
+        # CaPPBuilder() uses Ca-Ca distance criterion
         # Include non-standard residues
+        # more info. in biopdb_faq.pdf, page 11 @Xiang
         tmp = [ str(pp.get_sequence()) for pp in ppb.build_peptides(chain, aa_only=False) ]
 
         assert(not self.pdb_structure_AA)
-        self.pdb_structure_AA = '-' * len(self.pdb_AA)
+        self.pdb_structure_AA = '-' * len(self.pdb_AA) #assign all gaps
         edges = [None] * len(tmp)
         multiple = []
         i = 0
@@ -315,7 +320,7 @@ class Protein:
             # This doesn't cause a lot of loss since only very short (~2 res) fragments occur more than once
             n = self.pdb_AA.count(a)
             if(n == 1):
-                idx = string.find(self.pdb_AA, a)
+                idx = string.find(self.pdb_AA, a) # return the first element in a's notion in pdb_AA, could be 0 @Xiang
                 self.pdb_structure_AA = self.pdb_structure_AA[:idx] + a + self.pdb_structure_AA[idx+len(a):]
                 edges[i] = [idx, idx+len(a)]
             else:

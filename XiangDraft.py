@@ -49,4 +49,42 @@ out = subprocess.check_output([
                         '-asequence=asis:' + pdb_AA,
                         '-bsequence=asis:' + ccds_AA
                         ]).split('\n')
-print out
+#print out
+
+pdb_ID='4A14'
+office_Mac_address='/Users/xji3/clemensCode'
+address=office_Mac_address
+out_dir=address+'/newDataOutput/'
+pdb_file = out_dir +'pdb/'+ pdb_ID + '/' + pdb_ID + '.pdb'
+handle = gzip.open(pdb_file + '.gz', "r")
+structure = Bio.PDB.PDBParser().get_structure(pdb_ID, handle)
+
+print structure
+model = structure[0]
+
+chain_list = [ a.get_id() for a in model ]
+print chain_list
+chain=model[chain_list[0]]
+
+ppb=Bio.PDB.PPBuilder()
+print ppb
+bb=ppb.build_peptides(chain)
+print bb
+tmp = [ str(pp.get_sequence()) for pp in ppb.build_peptides(chain, aa_only=False) ]
+print tmp
+
+pdb_structure_AA = ''
+print not pdb_structure_AA
+assert(not pdb_structure_AA)
+pdb_structure_AA = '-' * len(pdb_AA)
+
+edges = [None] * len(tmp)
+print edges
+
+a=tmp[0]
+i=0
+n = pdb_AA.count(a)
+if(n == 1):
+    idx = string.find(pdb_AA, a) # return the first element in a's notion in pdb_AA, could be 0 @Xiang
+    pdb_structure_AA = pdb_structure_AA[:idx] + a + pdb_structure_AA[idx+len(a):]
+    edges[i] = [idx, idx+len(a)]
