@@ -301,10 +301,12 @@ class Protein:
         print 'Using chain:', chain_list[0]
         chain = model[chain_list[0]]
 
-        ppb = Bio.PDB.PPBuilder() 
+        ppb = Bio.PDB.PPBuilder()
+        print 'Using C-N distance criterion'
         # pdBuilder() uses C-N distance criterion
 
         #ppb = Bio.PDB.CaPPBuilder()
+        #print 'Using C-N distance criterion'
         # CaPPBuilder() uses Ca-Ca distance criterion
         # Include non-standard residues
         # more info. in biopdb_faq.pdf, page 11 @Xiang
