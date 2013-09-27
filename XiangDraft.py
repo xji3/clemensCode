@@ -28,6 +28,10 @@ from data_test import *
        
        
 PDB_id='4A14'
+#problem pdbIDs
+PDB_id='2V4U' #this protein has no match with the structure fragment from Bio.PDB
+
+pdb_ID=PDB_id
 
 pdb_AA='GAMGLPGAEEAPVRVALRVRPLLPKELLHGHQSCLQVEPGLGRVTLGRDRHFGFHVVLAEDAGQEAVYQACVQPLLEAFFEGFNATVFAYGQTGSGKTYTMGEASVASLLEDEQGIVPRAMAEAFKLIDENDLLDCLVHVSYLEVYKEEFRDLLEVGTASRDIQLREDERGNVVLCGVKEVDVEGLDEVLSLLEMGNAARHTGATHLNHLSSRSHTVFTVTLEQRGRAPSRLPRPAPGQLLVSKFHFVDLAGSERVLKTGSTGERLKESIQINSSLLALGNVISALGDPQRRGSHIPYRDSKITRILKDSLGGNAKTVMIACVSPSSSDFDETLNTLNYASRAQ'
 
@@ -51,7 +55,6 @@ out = subprocess.check_output([
                         ]).split('\n')
 #print out
 
-pdb_ID='4A14'
 office_Mac_address='/Users/xji3/clemensCode'
 address=office_Mac_address
 out_dir=address+'/newDataOutput/'
@@ -80,6 +83,7 @@ pdb_structure_AA = '-' * len(pdb_AA)
 
 edges = [None] * len(tmp)
 print edges
+multiple=[]
 
 a=tmp[0]
 i=0
@@ -88,3 +92,30 @@ if(n == 1):
     idx = string.find(pdb_AA, a) # return the first element in a's notion in pdb_AA, could be 0 @Xiang
     pdb_structure_AA = pdb_structure_AA[:idx] + a + pdb_structure_AA[idx+len(a):]
     edges[i] = [idx, idx+len(a)]
+elif n > 1:
+    multiple.append(i)
+else:
+    print
+i=i+1
+
+for i in multiple:
+    b = e = -1
+    if i == 0 and edges[i+1]:
+        b = 0
+        e = edges[i+1][0]
+    elif i == (len(tmp)-1) and edges[i-1]:
+        b = edges[i-1][1]
+        e = len(tmp)-1
+    elif edges[i-1] and edges[i+1]:
+        b = edges[i-1][1]
+        e = edges[i+1][0]
+    else:
+        print 'I don\'t know where to place this fragment. It appears >= 2x in the structure.'
+        print 'It will be ignored in the distance matrix:', tmp[i]
+        continue
+    if self.pdb_AA[b:e].count(tmp[i]) == 1:
+        idx = string.find(self.pdb_AA[b:e], tmp[i])
+        self.pdb_structure_AA = self.pdb_structure_AA[:b+idx] + tmp[i] + self.pdb_structure_AA[b+idx+len(tmp[i]):]
+    else:
+        print 'I don\'t know where to place this fragment. It appears >= 2x in the structure.',
+        print 'It will be ignored in the distance matrix:', tmp[i]

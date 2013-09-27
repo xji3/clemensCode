@@ -301,10 +301,10 @@ class Protein:
         print 'Using chain:', chain_list[0]
         chain = model[chain_list[0]]
 
-        ppb = Bio.PDB.PPBuilder() # ppb is now a PPBuilder class element @Xiang
+        ppb = Bio.PDB.PPBuilder() 
         # pdBuilder() uses C-N distance criterion
+
         #ppb = Bio.PDB.CaPPBuilder()
-        
         # CaPPBuilder() uses Ca-Ca distance criterion
         # Include non-standard residues
         # more info. in biopdb_faq.pdf, page 11 @Xiang
@@ -323,8 +323,10 @@ class Protein:
                 idx = string.find(self.pdb_AA, a) # return the first element in a's notion in pdb_AA, could be 0 @Xiang
                 self.pdb_structure_AA = self.pdb_structure_AA[:idx] + a + self.pdb_structure_AA[idx+len(a):]
                 edges[i] = [idx, idx+len(a)]
-            else:
+            elif n > 1 :
                 multiple.append(i)
+            else:
+                print 'There is no match of this fragment in the pdb AA sequence', a # May need more operation here @Xiang
             i = i+1
 
         # Give fragments we couldn't place unambiguously before a second try
