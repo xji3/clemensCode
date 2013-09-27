@@ -204,7 +204,7 @@ class Protein:
             iter = out.__iter__()
             # Parse water's output
             for line in iter:
-                if line.strip() and line.split()[0] == 'asis':
+                if line.strip() and line.split() and line.split()[0] == 'asis':
                     break
             aligned_subseq1 = line.split()
             pdb2ccds.pdb_local_alignment_start = int(aligned_subseq1[1]) - 1
