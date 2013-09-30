@@ -119,3 +119,29 @@ for i in multiple:
     else:
         print 'I don\'t know where to place this fragment. It appears >= 2x in the structure.',
         print 'It will be ignored in the distance matrix:', tmp[i]
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+iter = out.__iter__()
+for line in iter:
+    if line.strip() and line.split() and line.split()[0] == 'asis':
+        break
+aligned_subseq1 = line.split()
+pdb_local_alignment_start = int(aligned_subseq1[1]) - 1
+s1 = pdb_alignedAA = aligned_subseq1[2] # PDB sequence
+iter.next() # skip the vertical bars
+aligned_subseq2 = iter.next().split()
+assert(len(aligned_subseq1[2]) == len(aligned_subseq2[2]))
+ccds_local_alignment_start = int(aligned_subseq2[1]) - 1
+s2 = ccds_alignedAA = aligned_subseq2[2] # CCDS sequence
+algnmt_length = local_alignment_length = len(aligned_subseq2[2])
+
+s3 = pdb_structure_AA[pdb_local_alignment_start:]
+gaps = [ i.start() for i in re.finditer('-', s1) ]
+print gaps
+string.replace(s3, '-', '')
+
+
+        

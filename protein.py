@@ -218,7 +218,7 @@ class Protein:
 
             # Keep track of the gaps also in the actual structure sequence (not just the fasta of the structure)
             s3 = self.pdb_structure_AA[pdb2ccds.pdb_local_alignment_start:]
-            gaps = [ i.start() for i in re.finditer('-', s1) ]
+            gaps = [ i.start() for i in re.finditer('-', s1) ] # record all gap positions in s1 @Xiang
             string.replace(s3, '-', '')
             for i in gaps:
                 s3 = self.insertInString(i, s3, '-')
@@ -269,6 +269,7 @@ class Protein:
         # Sorting algorithm is stable; order of the first sort is preserved if second criterium is equal
         self.ccds_match = sorted(self.ccds_match, key=lambda prot: prot.percent_identity, reverse=True)
         self.ccds_match = sorted(self.ccds_match, key=lambda prot: prot.ungapped_segment_length, reverse=True)
+        # test in XiangDraft3.py @Xiang
 
 #-------------------------------------------------------------------------------
     def insertInString(self, idx, str, insert):
@@ -308,6 +309,8 @@ class Protein:
         #ppb = Bio.PDB.CaPPBuilder()
         #print 'Using C-N distance criterion'
         # CaPPBuilder() uses Ca-Ca distance criterion
+
+        
         # Include non-standard residues
         # more info. in biopdb_faq.pdf, page 11 @Xiang
         tmp = [ str(pp.get_sequence()) for pp in ppb.build_peptides(chain, aa_only=False) ]
@@ -366,12 +369,19 @@ class Protein:
 
         ppb = Bio.PDB.PPBuilder()
         # Include non-standard residues
+        print 'Using C-N distance criterion for DistMatrix Calculation'
+
+        #ppb = Bio.PDB.CaPPBuilder()
+        #print 'Using C-N distance criterion for DistMatrix Calculation'
+        # CaPPBuilder() uses Ca-Ca distance criterion
+        #@Xiang
+        
         tmp = [ str(pp.get_sequence()) for pp in ppb.build_peptides(chain, aa_only=False) ]
 
         # Join the lists to get nRes
         structure_residues = [None] * len(list(itertools.chain(*tmp)))
         idx = 0
-        for r in chain.get_residues():
+        for r in chain: #.get_residues() seems like r=residues in chain, which doesn't need that function @Xiang
             if r.has_id('CA') and r.get_id()[0] == ' ': # No Het
                 structure_residues[idx] = r
                 idx = idx + 1

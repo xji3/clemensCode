@@ -587,7 +587,7 @@ class Data:
         print '\tMinimum length of ungapped segment in local alignment =', min_alignment_length
         print '\tMinimum percent identity over length of this segment =', min_pct_identity
         remove_id = []
-        for k, v in self.proteins.iteritems():
+        for k, v in self.proteins.iteritems(): #k is pdbID, v is class protein @Xiang
             if not v.checkAlignmentThresholds(min_alignment_length, min_pct_identity):
                 remove_id.append(k)
 
