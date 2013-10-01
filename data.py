@@ -534,7 +534,7 @@ class Data:
         self.fetchPDBs()
         for pdb in self.pdb2ccds:
             # Create a new instance of protein
-            self.proteins[pdb] = Protein(pdb, self.pdb_seqs[pdb][0], self.out_dir + '/pdb/')
+            self.proteins[pdb] = Protein(pdb, self.pdb_seqs[pdb][0], self.out_dir + 'pdb/')
 
             # Assign CCDS
             for ccds in self.pdb2ccds[pdb]:

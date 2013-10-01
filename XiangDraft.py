@@ -140,8 +140,30 @@ algnmt_length = local_alignment_length = len(aligned_subseq2[2])
 
 s3 = pdb_structure_AA[pdb_local_alignment_start:]
 gaps = [ i.start() for i in re.finditer('-', s1) ]
-print gaps
+#print gaps
 string.replace(s3, '-', '')
 
 
-        
+#################################################################################
+#################################################################################
+#################################################################################
+
+
+for pp in Bio.PDB.PPBuilder().build_peptides(chain,aa_only=False):
+    print pp.get_sequence()
+
+tmp = [ str(pp.get_sequence()) for pp in ppb.build_peptides(chain, aa_only=False) ]
+print tmp
+
+structure_residues = [None] * len(list(itertools.chain(*tmp)))
+idx = 0
+for r in chain: #.get_residues() seems like r=residues in chain, which doesn't need that function @Xiang
+    if r.has_id('CA') and r.get_id()[0] == ' ': # No Het
+        structure_residues[idx] = r
+        idx = idx + 1
+#print structure_residues
+
+dmat = numpy.empty((len(pdb_AA), len(pdb_AA)), numpy.float)
+dmat[:] = numpy.NAN
+
+print dmat

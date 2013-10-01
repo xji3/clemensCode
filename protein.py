@@ -111,9 +111,9 @@ class Protein:
 #                f.write('\n')
 
         # Version for Jeff
-        ccds = self.ccds_match[0]
+        ccds = self.ccds_match[0] #alright, no loops here @Xiang
         tmpstr = ccds.ccds_AA[:ccds.ccds_local_alignment_start] + string.replace(ccds.ccds_alignedAA[:ccds.ungapped_segment_start], '-', '')
-        idx = 3*len(tmpstr)
+        idx = 3*len(tmpstr) # Maybe should record this location in the future, it's used several times @Xiang
         tmpstr = ccds.ccds_DNA[idx:idx+3*ccds.ungapped_segment_length]
 
         tmpstr2 = ccds.pdb_aligned_structure_AA[ccds.ungapped_segment_start:ccds.ungapped_segment_start+ccds.ungapped_segment_length]
@@ -122,7 +122,7 @@ class Protein:
         with gzip.open(self.out_dir + self.pdb_ID + '/' + self.pdb_ID + '.pw.gz', 'w') as f:
             f.write(self.pdb_ID + ' ' + str(nres) + '\n')
             idx1 = 1
-            for i in range(r_from, r_to-1):
+            for i in range(r_from, r_to-1): # not that necessary to use -1 for the loop here @Xiang range(r_to, r_to)=[], anyhow, it's good habit @Xiang
                 idx2 = idx1+1
                 for j in range(i+1, r_to):
                     if not math.isnan(dmat[i, j]):
@@ -165,7 +165,7 @@ class Protein:
             # The DNA sequence for the ungapped segment
             strng = ccds.ccds_DNA[idx:idx+3*ccds.ungapped_segment_length]
 
-            idx = 0
+            
             # Start of ungapped segment in the PDB fasta sequence
             r_from = string.find(self.pdb_AA, ccds.pdb_alignedAA[ccds.ungapped_segment_start:ccds.ungapped_segment_start+ccds.ungapped_segment_length])
             # End of ungapped segment in the PDB fasta sequence
@@ -173,17 +173,48 @@ class Protein:
             # The structure sequence is aligned to the fasta sequence, may have gaps in the ungapped segment
             nres = len(self.pdb_structure_AA[r_from:r_to]) - self.pdb_structure_AA[r_from:r_to].count('-')
 
-            f.write(self.pdb_ID + ' ' + str(nres) + '\n')
-            nchck = 0
+            idx = 0
+
+            # need to update idx to first residue that has structure information
+##           while self.pdb_structure_AA[idx] == '-':
+##                idx = idx + 1
+
+##            f.write(self.pdb_ID + ' ' + str(nres) + '\n')
+##            nchck = 0
+##            for item in rd:
+##                if idx >= r_from and idx < r_to:
+##                    while self.pdb_structure_AA[idx] == '-':
+###                        f.write(str(idx+1) + '\t-\tnan\tnan\n')
+##                        idx = idx + 1
+##                    if item[0].has_id('CA') and item[0].get_id()[0] == ' ': # No Het
+##                        f.write(str(idx+1) + '\t' + strng[idx*3:idx*3+3] + '\t' + str(item[1][0]) + '\t' + str(item[1][1]) + '\n')
+##                        nchck = nchck + 1
+##                idx = idx + 1
+
+            #Xiang Version start
+            Non_Stand_pos=defaultdict(list) # recording where non-standard AA or un-classified cases like 'H_PTR' is
+            nchck=0
             for item in rd:
-                if idx >= r_from and idx < r_to:
-                    while self.pdb_structure_AA[idx] == '-':
+                while self.pdb_structure_AA[idx] == '-':
 #                        f.write(str(idx+1) + '\t-\tnan\tnan\n')
-                        idx = idx + 1
-                    if item[0].has_id('CA') and item[0].get_id()[0] == ' ': # No Het
+                    idx = idx + 1
+                    
+                if item[0].get_id()[0][0:2]=='H_' and item[0].get_id()[0]!='H_W': # exclude the non standard MSE case for now
+                    nres = nres-1
+                    nonStandID=item[0].get_id()[0]
+                    Non_Stand_pos[nonStandID].append(idx)
+                #print item[0].has_id('CA'), item[0].get_id()[0] == ' ', idx >= r_from, idx < r_to, item[0].get_id()
+                if item[0].has_id('CA') and item[0].get_id()[0] == ' ' and idx >= r_from and idx < r_to: # No Het
                         f.write(str(idx+1) + '\t' + strng[idx*3:idx*3+3] + '\t' + str(item[1][0]) + '\t' + str(item[1][1]) + '\n')
-                    nchck = nchck + 1
+                        nchck = nchck + 1
                 idx = idx + 1
+            if Non_Stand_pos:
+                print '=============Warning: non-standard Amino Acid occuring'
+                print 'pdb ID: ', self.pdb_ID
+                for nonStand in Non_Stand_pos:
+                    print 'non-standard AA: ', nonStand, 'occurred at positions: ', Non_Stand_pos[nonStand]
+
+            #End of Xiang Version
             assert(nchck == nres)
 
 #-------------------------------------------------------------------------------
@@ -391,7 +422,7 @@ class Protein:
         nres = len(structure_residues)
         r_idx1 = 0
         tot = len(self.pdb_AA)
-        for i in range(tot-1):
+        for i in range(tot-1): #why -1 range(3)=[0,1,2] Stop Codon? @Xiang 
             if self.pdb_structure_AA[i] != '-' and structure_residues[r_idx1]:
                 dmat[i, i] = 0.0
                 r1 = structure_residues[r_idx1]
