@@ -10,15 +10,16 @@ import residueDepth as ResDepth
 #-------------------------------------------------------------------------------
 class Protein:
 #-------------------------------------------------------------------------------
-    def __init__(self, id, aa, ds_dir):
+    def __init__(self, id, aa, ds_dir,criterion):
         print 'PDB:', id,
         self.out_dir = ds_dir
         self.pdb_ID = id
         self.pdb_AA = aa # the fasta sequence
         self.pdb_structure_AA = '' # the structure seq aligned to the fasta seq
-        self.parsePDBfile()
         self.ccds_match = []
         self.hasMatch = False
+        self.crit=criterion
+        self.parsePDBfile()
 
 #-------------------------------------------------------------------------------
     def printFastaSequences(self):
@@ -345,13 +346,20 @@ class Protein:
         print 'Using chain:', chain_list[0]
         chain = model[chain_list[0]]
 
-        ppb = Bio.PDB.PPBuilder()
-        print 'Using C-N distance criterion'
-        # pdBuilder() uses C-N distance criterion
-
-        #ppb = Bio.PDB.CaPPBuilder()
-        #print 'Using C-N distance criterion'
-        # CaPPBuilder() uses Ca-Ca distance criterion
+        if self.crit=='C-N':
+            ppb = Bio.PDB.PPBuilder()
+            print 'Using C-N distance criterion'
+            # pdBuilder() uses C-N distance criterion
+        elif self.crit=='Ca-Ca':
+            ppb = Bio.PDB.CaPPBuilder()
+            print 'Using Ca-Ca distance criterion'
+            # CaPPBuilder() uses Ca-Ca distance criterion
+        else:
+            ppb = Bio.PDB.CaPPBuilder()
+            print 'Using Ca-Ca distance criterion'
+            # CaPPBuilder() uses Ca-Ca distance criterion
+            # Use Ca-Ca criterion by default
+        
 
         
         # Include non-standard residues
@@ -410,14 +418,20 @@ class Protein:
         chain_list = [ a.get_id() for a in model ]
         chain = model[chain_list[0]]
 
-        ppb = Bio.PDB.PPBuilder()
-        # Include non-standard residues
-        print 'Using C-N distance criterion for DistMatrix Calculation'
+        if self.crit=='C-N':
+            ppb = Bio.PDB.PPBuilder()
+            # Include non-standard residues
+            print 'Using C-N distance criterion for DistMatrix Calculation'
+        elif self.crit=='Ca-Ca':
 
-        #ppb = Bio.PDB.CaPPBuilder()
-        #print 'Using C-N distance criterion for DistMatrix Calculation'
-        # CaPPBuilder() uses Ca-Ca distance criterion
-        #@Xiang
+            ppb = Bio.PDB.CaPPBuilder()
+            print 'Using Ca-Ca distance criterion for DistMatrix Calculation'
+            # CaPPBuilder() uses Ca-Ca distance criterion
+            #@Xiang
+        else:
+            ppb = Bio.PDB.CaPPBuilder()
+            print 'Using Ca-Ca distance criterion for DistMatrix Calculation'
+            # Use Ca-Ca criterion by default
         
         tmp = [ str(pp.get_sequence()) for pp in ppb.build_peptides(chain, aa_only=False) ]
 

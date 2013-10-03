@@ -19,13 +19,19 @@ office_Mac_address='/Users/xji3/clemensCode'
 #laptop_address='E:/Dropbox/Dropbox/My Files/BRC/Small Project/Clemens PY code'
 address=office_Mac_address
 
+CnFolder='/newDataOutput'
+CaFolder='/CaOutput'
+OutputFolder=CaFolder
+
 group = OptionGroup(optpars, "Mandatory options")
-group.add_option("-d", "--dsdir", action="store", dest="ds_dir", default=(address+'/newDataOutput'),
+group.add_option("-d", "--dsdir", action="store", dest="ds_dir", default=(address+OutputFolder),
                    help='Mandatory: data-set output directory')
 group.add_option("-f", "--file", action="store", dest="xmlfilename", default=(address+'/input/pdb_search.xml'),
                    help='Mandatory: XML file for PDB query')
-group.add_option("-p", "--pisadir", action="store", dest="local_pisadir", default=(address+'/newDataOutput/pisa'),
+group.add_option("-p", "--pisadir", action="store", dest="local_pisadir", default=(address+OutputFolder+'/pisa'),
                    help='Mandatory: local dir where Pisa files should be stored')
+group.add_option("-c", "--criterion", action="store", dest="DistCriterion", default=('Ca-Ca'),# Choose between C-N or Ca-Ca
+                   help='Mandatory: distance criterion')
 optpars.add_option_group(group)
 
 #Xiaqng's change
@@ -49,6 +55,7 @@ optpars.add_option("-m", "--initmp", action="store", dest="initmp_filename", def
                    help='Skip mpstruc search, read PDB-IDs from this (single-column) file instead')
 optpars.add_option("-o", "--initmono", action="store", dest="initmono_filename", default=(address+'/input/monomers.txt'),
                    help='Skip Pisa step, read monomer PDB-IDs from this (single-column) file instead')
+
 ##args=['-d','aaa','-f','bbb','-p','ccc']
 ##optpars.set_defaults(xmlfilename='aaa')
 (options, args) = optpars.parse_args()
@@ -68,7 +75,7 @@ if __name__ == '__main__':
     # Initialize Data object
     #---------------------------------------------------------------------------
     if options.ds_dir[-1] != '/': options.ds_dir = options.ds_dir + '/'
-    data = Data(options.initpdb_filename, options.xmlfilename, options.ds_dir)
+    data = Data(options.initpdb_filename, options.xmlfilename, options.ds_dir,options.DistCriterion)
     
     #---------------------------------------------------------------------------
     # Apply additional filters (no membrane proteins, only monomers, ...)

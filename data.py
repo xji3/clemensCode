@@ -10,7 +10,7 @@ from collections import defaultdict
 #-------------------------------------------------------------------------------
 class Data:
 #-------------------------------------------------------------------------------
-    def __init__(self, init_pdblist, init_xml, ds_dir):
+    def __init__(self, init_pdblist, init_xml, ds_dir, DistCriterion):
         self.out_dir = ds_dir
         self.pdb_url = 'http://www.rcsb.org/pdb/rest/search'
         self.pdb_ftp = 'ftp.wwpdb.org'
@@ -27,6 +27,7 @@ class Data:
         self.uniprot2geneid = defaultdict(list)
         self.ccds_table = defaultdict(list)
         self.pdb2ccds = defaultdict(list)
+        self.crit=DistCriterion
 
         if init_pdblist is None:
             self.queryPDB(init_xml)
@@ -534,7 +535,7 @@ class Data:
         self.fetchPDBs()
         for pdb in self.pdb2ccds:
             # Create a new instance of protein
-            self.proteins[pdb] = Protein(pdb, self.pdb_seqs[pdb][0], self.out_dir + 'pdb/')
+            self.proteins[pdb] = Protein(pdb, self.pdb_seqs[pdb][0], self.out_dir + 'pdb/',self.crit)
 
             # Assign CCDS
             for ccds in self.pdb2ccds[pdb]:
