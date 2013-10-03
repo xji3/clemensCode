@@ -71,33 +71,7 @@ def _read_vertex_array(filename):
     fp.close()
     return array(vertex_list)
 
-def get_surface(pdb_file, PDB_TO_XYZR="./aux/pdb_to_xyzr", MSMS="./aux/msms"):
-    """
-    Return a Numeric array that represents 
-    the vertex list of the molecular surface.
 
-    PDB_TO_XYZR --- pdb_to_xyzr executable (arg. to os.system)
-    MSMS --- msms executable (arg. to os.system)
-    """
-    # extract xyz and set radii
-    xyz_tmp=tempfile.mktemp()
-    PDB_TO_XYZR=PDB_TO_XYZR+" %s > %s"
-    make_xyz=PDB_TO_XYZR % (pdb_file, xyz_tmp)
-    os.system(make_xyz)
-    # make surface
-    surface_tmp=tempfile.mktemp()
-    MSMS=MSMS+" -probe_radius 1.5 -if %s -of %s > "+tempfile.mktemp()
-    make_surface=MSMS % (xyz_tmp, surface_tmp)
-    os.system(make_surface)
-    surface_file=surface_tmp+".vert"
-    # read surface vertices from vertex file
-    surface=_read_vertex_array(surface_file)
-    # clean up tmp files
-    # ...this is dangerous
-    #os.system("rm "+xyz_tmp)
-    #os.system("rm "+surface_tmp+".vert")
-    #os.system("rm "+surface_tmp+".face")
-    return surface
 
 
 def min_dist(coord, surface):
@@ -134,29 +108,76 @@ class ResidueDepth(AbstractPropertyMap):
     Calculate residue and CA depth for all residues.
     """
     def __init__(self, model, pdb_file):
+        
         depth_dict={}
         depth_list=[]
         depth_keys=[]
+        self.terminate=False
         # get_residue
         residue_list=Selection.unfold_entities(model, 'R')
         # make surface from PDB file
-        surface=get_surface(pdb_file)
+        surface=self.get_surface(pdb_file)
+
+        if not self.terminate:
         # calculate rdepth for each residue
-        for residue in residue_list:
-            if not is_aa(residue):
-                continue
-            rd=residue_depth(residue, surface)
-            ca_rd=ca_depth(residue, surface)
-            # Get the key
-            res_id=residue.get_id()
-            chain_id=residue.get_parent().get_id()
-            depth_dict[(chain_id, res_id)]=(rd, ca_rd)
-            depth_list.append((residue, (rd, ca_rd)))
-            depth_keys.append((chain_id, res_id))
-            # Update xtra information
-            residue.xtra['EXP_RD']=rd
-            residue.xtra['EXP_RD_CA']=ca_rd
-        AbstractPropertyMap.__init__(self, depth_dict, depth_keys, depth_list)
+            for residue in residue_list:
+                if not is_aa(residue):
+                    continue
+                rd=residue_depth(residue, surface)
+                ca_rd=ca_depth(residue, surface)
+                # Get the key
+                res_id=residue.get_id()
+                chain_id=residue.get_parent().get_id()
+                depth_dict[(chain_id, res_id)]=(rd, ca_rd)
+                depth_list.append((residue, (rd, ca_rd)))
+                depth_keys.append((chain_id, res_id))
+                # Update xtra information
+                residue.xtra['EXP_RD']=rd
+                residue.xtra['EXP_RD_CA']=ca_rd
+            AbstractPropertyMap.__init__(self, depth_dict, depth_keys, depth_list)
+        else:
+            return None
+
+    def get_surface(self,pdb_file, PDB_TO_XYZR="./aux/pdb_to_xyzr", MSMS="./aux/msms"):
+        """
+        Return a Numeric array that represents 
+        the vertex list of the molecular surface.
+
+        PDB_TO_XYZR --- pdb_to_xyzr executable (arg. to os.system)
+        MSMS --- msms executable (arg. to os.system)
+        """
+        if self.terminate==False:
+            # extract xyz and set radii
+            xyz_tmp=tempfile.mktemp()
+            PDB_TO_XYZR=PDB_TO_XYZR+" %s > %s"
+            make_xyz=PDB_TO_XYZR % (pdb_file, xyz_tmp)
+            if os.system(make_xyz): #Xiang Check
+                self.terminate=True
+            else:
+                os.system(make_xyz)
+            # make surface
+            surface_tmp=tempfile.mktemp()
+            MSMS=MSMS+" -probe_radius 1.5 -if %s -of %s > "+tempfile.mktemp()
+            make_surface=MSMS % (xyz_tmp, surface_tmp)
+            if os.system(make_surface):#Xiang Check
+                self.terminate=True
+            else:
+                os.system(make_surface) # might calculate twice, live with it for now
+            surface_file=surface_tmp+".vert"
+            # read surface vertices from vertex file
+            if not self.terminate:
+                surface=_read_vertex_array(surface_file)
+                return surface
+            else:
+                return None
+            # clean up tmp files
+            # ...this is dangerous
+            #os.system("rm "+xyz_tmp)
+            #os.system("rm "+surface_tmp+".vert")
+            #os.system("rm "+surface_tmp+".face")
+        else:
+            return None
+        
 
 #if __name__=="__main__":
 #

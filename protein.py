@@ -158,6 +158,10 @@ class Protein:
         
             rd = ResDepth.ResidueDepth(chain, pdb_file + '.gz')
 
+            if rd.terminate:
+                print '===========Warning: MSMS or pdb_to_xyzr doesnot work'
+                return False
+
             # CCDS string up until the beginning of the ungapped segment without gaps
             tmpstr = ccds.ccds_AA[:ccds.ccds_local_alignment_start] + string.replace(ccds.ccds_alignedAA[:ccds.ungapped_segment_start], '-', '')
             # First codon of ungapped sequence in DNA sequence
