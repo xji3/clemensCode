@@ -1,0 +1,7 @@
+REM  Relative accessibilites read from external file "/Users/xji3/Documents/Naccess/standard.data"
+REM  File of summed (Sum) and % (per.) accessibilities for 
+REM RES _ NUM      All-atoms   Total-Side   Main-Chain    Non-polar    All polar
+REM                ABS   REL    ABS   REL    ABS   REL    ABS   REL    ABS   REL
+END  Absolute sums over single chains surface 
+END  Absolute sums over all chains 
+TOTAL              .0           .0           .0           .0           .0
