@@ -19,7 +19,7 @@ office_Mac_address='/Users/xji3/clemensCode'
 #laptop_address='E:/Dropbox/Dropbox/My Files/BRC/Small Project/Clemens PY code'
 address=office_Mac_address
 
-CnFolder='/newDataOutput'
+CnFolder='/CnDataOutput'
 CaFolder='/CaOutput'
 OutputFolder=CaFolder
 

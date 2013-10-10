@@ -21,18 +21,49 @@ import os
 ##                        '-bsequence=asis:' + ccds_AA
 ##                    ]).split('\n')
 
-pdb_file='/Users/xji3/Documents/Naccess/4A14.pdb.gz'
-
 naccess_localfile_dir='/Users/xji3/Documents/Naccess'
+
+pdb_file='/Users/xji3/Documents/Naccess/4A14.pdb'
+pdb_id='4A14'
+
 if os.path.isfile(naccess_localfile_dir+'/naccess'):
     naccess=naccess_localfile_dir+'/naccess'
 else:
     naccess= 'naccess'
 
 print subprocess.check_output([
+    'ls',
+    '-l'
+    ],cwd=naccess_localfile_dir+'/')
+
+if os.path.isfile(naccess_localfile_dir+'/'+pdb_id+'.pdb.gz'):
+    print subprocess.check_output([
+        'gzip',
+        '-d',
+        '-f',
+        pdb_id+'.pdb.gz',
+        ],cwd=naccess_localfile_dir+'/')
+    
+    print subprocess.check_output([
     naccess,
     pdb_file
     ],cwd=naccess_localfile_dir+'/')
+    
+elif os.path.isfile(naccess_localfile_dir+'/'+pdb_id+'.pdb'):
+    print subprocess.check_output([
+    naccess,
+    pdb_file
+    ],cwd=naccess_localfile_dir+'/')
+    
+print subprocess.check_output([
+    'gzip',
+    pdb_id+'.pdb',
+    ],cwd=naccess_localfile_dir+'/')
+
+
+
+
+
 
 #subprocess.Popen(naccess,cwd=r'./pdb')
 ##with open('./pdb','w') as outfile:

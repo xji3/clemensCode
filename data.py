@@ -45,10 +45,15 @@ class Data:
         print 'Writing output files and calculating distance matrices & solvent accessibilities.'
         if not os.path.exists(self.out_dir):
             os.makedirs(self.out_dir)
+        total_pdb_num=len(self.pdbIDs)
+        finishednum=1
         with open(self.out_dir + 'PDB_ID_list_final.txt', 'w') as f_pdb:
             f_pdb.write(str(len(self.proteins.keys())) + '\n')
             for pdbid, p in self.proteins.items():
-                print '\t', pdbid
+                
+                print '\t', pdbid, '\t', 'Calculation done:',finishednum/total_pdb_num*100,'%'
+                finishednum = finishednum+1
+
                 f_pdb.write(pdbid + '\n')
                 p.printInfo()
                 with gzip.open(self.out_dir + 'pdb/' + pdbid + '/' + pdbid + '.map.gz', 'w') as id_pdb:

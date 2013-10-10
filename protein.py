@@ -202,7 +202,7 @@ class Protein:
             nchck=0
             for item in rd:
                 while idx<r_to and self.pdb_structure_AA[idx] == '-':
-#                        f.write(str(idx+1) + '\t-\tnan\tnan\n')
+                    #f.write(str(idx+1) + '\t-\tnan\tnan\n')
                     idx = idx + 1
 
                 if idx<r_to and idx>=r_from:
@@ -213,9 +213,9 @@ class Protein:
                     if not item[0].has_id('CA'):
                         nres = nres-1
                         Strange_ID.append(idx)
-                #print item[0].has_id('CA'), item[0].get_id()[0] == ' ', idx >= r_from, idx < r_to, item[0].get_id()
-                if item[0].has_id('CA') and item[0].get_id()[0] == ' ' and idx >= r_from and idx < r_to: # No Het
-                        f.write(str(idx+1) + '\t' + strng[idx*3:idx*3+3] + '\t' + str(item[1][0]) + '\t' + str(item[1][1]) + '\n')
+
+                    if item[0].has_id('CA') and item[0].get_id()[0] == ' ': # No Het
+                        f.write(str(idx+1) + '\t' + strng[(idx-r_from)*3:(idx-r_from)*3+3] + '\t' + str(self.pdb_structure_AA[idx]) + '\t' + str(item[1][0]) + '\t' + str(item[1][1]) + '\n')
                         nchck = nchck + 1
                 idx = idx + 1
             if Non_Stand_pos:
@@ -231,6 +231,46 @@ class Protein:
             assert(nchck == nres)
 
 #-------------------------------------------------------------------------------
+    def printnAccess(self):        
+        pdb_id=self.pdb_ID
+        pdb_file_dir=self.out_dir + pdb_id + '/'
+        pdb_file=pdb_file_dir+pdb_id+'.pdb'
+        
+        naccess_localfile_dir='/Users/xji3/Documents/Naccess'
+        if os.path.isfile(naccess_localfile_dir+'/naccess'):
+            naccess=naccess_localfile_dir+'/naccess'
+        else:
+            naccess= 'naccess'
+
+        if os.path.isfile(pdb_file_dir+pdb_id+'.pdb.gz'):
+            subprocess.check_output([
+                'gzip',
+                '-d',
+                '-f',
+                pdb_id+'.pdb.gz',
+                ],cwd=pdb_file_dir)
+            
+            print subprocess.check_output([
+            naccess,
+            pdb_file
+            ],cwd=pdb_file_dir)
+            
+        elif os.path.isfile(pdb_file_dir+pdb_id+'.pdb'):
+            print subprocess.check_output([
+            naccess,
+            pdb_file
+            ],cwd=pdb_file_dir)
+        else:
+            print '=============Warning: .pdb file not found for pdbID:',pdb_id
+            print 'Please check ftp query function and make sure', pdb_id, '.pdb.gz exists'
+            
+
+        subprocess.check_output([
+            'gzip',
+            pdb_id+'.pdb',
+            ],cwd=pdb_file_dir)
+
+#-------------------------------------------------------------------------------
     def printInfo(self):
         self.printFastaSequences()
         self.printPDBfasta2StructureAlignment()
@@ -240,6 +280,7 @@ class Protein:
         self.printMismatches()
         self.printSeqFile()
         self.printSolvAcc()
+        self.printnAccess()
 
 #-------------------------------------------------------------------------------
     def alignCCDSlocal(self):
